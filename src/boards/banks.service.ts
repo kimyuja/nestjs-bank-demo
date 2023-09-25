@@ -5,6 +5,7 @@ import { BankRepository } from './bank.repository';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Bank } from './bank.entity';
 import { Users } from 'src/auth/user.entity';
+import { PatchBankDto as PatchBankDto } from './dto/patch-bank.dto';
 
 @Injectable()
 export class BanksService {
@@ -12,9 +13,6 @@ export class BanksService {
         @InjectRepository(BankRepository)
         private bankRepository: BankRepository,
     ) { }
-    // getAllBoards(): Board[] {
-    //     return this.boards;
-    // }
 
     async getAllBanks(
         user: Users
@@ -27,20 +25,6 @@ export class BanksService {
 
         return banks;
     }
-
-    // createBoard(createBoardDto: CreateBoardDto) {
-    //     const { title, description } = createBoardDto;
-
-    //     const board: Board = {
-    //         id: uuid(),
-    //         title,
-    //         description,
-    //         status: BoardStatus.PUBLIC
-    //     }
-
-    //     this.boards.push(board);
-    //     return board;
-    // }
 
     createBank(createBankDto: CreateBankDto, user: Users): Promise<Bank> {
         if (createBankDto.status == BankStatus.DEPOSIT) {
@@ -99,16 +83,6 @@ export class BanksService {
 
     }
 
-    // getBoardById(id: string): Board {
-    //     const found = this.boards.find((board) => board.id === id);
-
-    //     if (!found) {
-    //         throw new NotFoundException(`Can't find Board with id ${id}`);
-    //     }
-
-    //     return found;
-    // }
-
     async deleteBank(id: number, user: Users): Promise<void> {
         const result = await this.bankRepository.delete({ id, user });
 
@@ -117,24 +91,22 @@ export class BanksService {
         }
     }
 
-    // deleteBoard(id: string): void {
-    //     const found = this.getBoardById(id);
-    //     this.boards = this.boards.filter((board) => board.id !== found.id);
-    // }
-
-
-    async updateBankStatus(id: number, status: BankStatus): Promise<Bank> {
+    async updateBankStatus(id: number, status: BankStatus, patchBankDto: PatchBankDto): Promise<Bank> {
         const bank = await this.getBankById(id);
 
         bank.status = status;
+        bank.title = patchBankDto.title;
+
+        if (status == BankStatus.DEPOSIT) {
+            const accountNumber = "110-" + this.generate(3) + "-" + this.generate(6);
+            bank.accountNumber = accountNumber;
+        } else {
+            const accountNumber = "223-" + this.generate(3) + "-" + this.generate(6);
+            bank.accountNumber = accountNumber;
+        }
         await this.bankRepository.save(bank);
 
         return bank;
     }
-    // updateBoardStatus(id: string, status: BoardStatus): Board {
-    //     const board = this.getBoardById(id);
-    //     board.status = status;
-    //     return board;
-    // }
 
 }

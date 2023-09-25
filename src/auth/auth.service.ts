@@ -41,4 +41,10 @@ export class AuthService {
         }
         return found.banks;
     }
+
+    async deleteUser(id: number): Promise<string> {
+        const found = await this.userRepository.findOne(id);
+        await this.userRepository.delete(id);
+        return ("deleted user name : " + found.username);
+    }
 }

@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Get, UseGuards, ValidationPipe, Param, ForbiddenException } from '@nestjs/common';
+import { Body, Controller, Post, Get, UseGuards, ValidationPipe, Param, ForbiddenException, Delete } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { AuthCredentialsDto } from './dto/auth-credential.dto';
@@ -30,7 +30,6 @@ export class AuthController {
     @Get('/private/:userid')
     @UseGuards(AuthGuard())
     getBankByUserId(@Param('userid') id: number, @GetUser() user: Users): Promise<Bank[]> {
-        console.log(user);
         if (user.id == id) {
             return this.authService.getBanksByUserId(id);
         } else {
@@ -38,5 +37,14 @@ export class AuthController {
         }
     }
 
+    @Delete('/:userid')
+    @UseGuards(AuthGuard())
+    deleteUser(@Param('userid') id: number, @GetUser() user: Users): Promise<string> {
+        if (user.id == id) {
+            return this.authService.deleteUser(id);
+        } else {
+            throw new ForbiddenException("You are only allowed to delete your own account.")
+        }
+    }
 }
 

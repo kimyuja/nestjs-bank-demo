@@ -7,17 +7,13 @@ import { Bank } from './bank.entity';
 import { BanksService as BanksService } from './banks.service';
 import { CreateBankDto as CreateBankDto } from './dto/create-bank.dto';
 import { BoardStatusValidationPipe as BankStatusValidationPipe } from './pipes/bank-status-validation.pipe';
+import { PatchBankDto as PatchBankDto } from './dto/patch-bank.dto';
 
 @Controller('banks')
 @UseGuards(AuthGuard())
 export class BanksController {
     private logger = new Logger('Banks');
     constructor(private banksService: BanksService) { }
-
-    // @Get('/')
-    // getAllBoard(): Board[] {
-    //     return this.boardsService.getAllBoards();
-    // }
 
     @Get()
     getAllBank(
@@ -26,14 +22,6 @@ export class BanksController {
         this.logger.verbose(`User ${user.username} trying to get all boards`);
         return this.banksService.getAllBanks(user);
     }
-
-    // @Post()
-    // @UsePipes(ValidationPipe)
-    // createBoard(
-    //     @Body() createBoardDto: CreateBoardDto
-    // ): Board {
-    //     return this.boardsService.createBoard(createBoardDto);
-    // }
 
     @Post()
     @UsePipes(ValidationPipe)
@@ -57,17 +45,13 @@ export class BanksController {
         return this.banksService.deleteBank(id, user);
     }
 
-    // @Delete('/:id')
-    // deleteBoard(@Param('id') id: string): void {
-    //     this.boardsService.deleteBoard(id);
-    // }
-
     @Patch('/:id/status')
     updateBankStatus(
         @Param('id', ParseIntPipe) id: number,
-        @Body('status', BankStatusValidationPipe) status: BankStatus
+        @Body('status', BankStatusValidationPipe) status: BankStatus,
+        @Body() patchBankDto: PatchBankDto
     ) {
-        return this.banksService.updateBankStatus(id, status);
+        return this.banksService.updateBankStatus(id, status, patchBankDto);
     }
 
 }
