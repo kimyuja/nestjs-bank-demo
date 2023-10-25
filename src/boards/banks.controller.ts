@@ -54,4 +54,10 @@ export class BanksController {
         return this.banksService.updateBankStatus(id, status, patchBankDto);
     }
 
+    // 입출금 기능
+
+    // 계좌 이체
+
+    // 잔액 조회
+
 }

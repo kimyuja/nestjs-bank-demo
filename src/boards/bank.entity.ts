@@ -10,8 +10,8 @@ export class Bank extends BaseEntity {
     @Column()
     title: string;
 
-    @Column()
-    description: string;
+    @Column('simple-array')
+    description: number[];
 
     @Column()
     status: BankStatus;

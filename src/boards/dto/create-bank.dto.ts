@@ -6,7 +6,7 @@ export class CreateBankDto {
     title: string;
 
     @IsNotEmpty()
-    description: string;
+    description: number[];
 
     @IsNotEmpty()
     status: BankStatus;
