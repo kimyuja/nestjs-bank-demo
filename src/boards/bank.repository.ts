@@ -23,6 +23,7 @@ export class BankRepository extends Repository<Bank> {
             status,
             user,
             accountNumber,
+            balance: 0,
         })
 
         await this.save(bank);

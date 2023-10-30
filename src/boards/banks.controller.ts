@@ -9,6 +9,7 @@ import { CreateBankDto as CreateBankDto } from './dto/create-bank.dto';
 import { BoardStatusValidationPipe as BankStatusValidationPipe } from './pipes/bank-status-validation.pipe';
 import { PatchBankDto as PatchBankDto } from './dto/patch-bank.dto';
 import { PlusMinusBankDto } from './dto/plus-minus-bank.dto';
+import { TransferBankDto } from './dto/transfer-bank.dto';
 
 @Controller('banks')
 @UseGuards(AuthGuard())
@@ -57,12 +58,29 @@ export class BanksController {
 
     // 입출금 기능
     @Patch('/plusminus')
-    plusMinusBank(@Body() plusMinusBankDto: PlusMinusBankDto) {
+    plusMinusBank(@Body() plusMinusBankDto: PlusMinusBankDto): Promise<number> {
         return this.banksService.plusMinusBank(plusMinusBankDto);
     }
 
-    // 계좌 이체
-
     // 잔액 조회
+    // 내 계좌 번호로 find 해서 그 것의 잔액 리턴
+    @Get('/balance/:id')
+    getBalance(@Param('id', ParseIntPipe) id: number, @GetUser() user: Users): Promise<number> {
+        return this.banksService.getBalance(id, user);
+    }
 
+    // 계좌 이체
+    // 이체 금액, 계좌 번호, 예금주 확인, 금액 이체할 내 계좌 번호, 금액 이체할 내 계좌의 잔액 조회. 까지 프론트에서 받아 옴 
+    // -> 계좌 번호(혹은 계좌 아이디)로 findOne 해서 예금주 이름이랑 대조해 본 뒤 맞으면 
+    // 내 입출금 통장에서 이체 금액만큼 빼서 해당 계좌에 넣기
+    @Post('/transfer')
+    transferBank(@Body() transferBankDto: TransferBankDto, @GetUser() user: Users): Promise<string> {
+        return this.banksService.transferBank(transferBankDto, user);
+    }
+
+    // 거래 내역 조회
+    @Get('/description/:id')
+    getDescription(@Param('id', ParseIntPipe) id: number, @GetUser() user: Users): Promise<number[]> {
+        return this.banksService.getDescription(id, user);
+    }
 }

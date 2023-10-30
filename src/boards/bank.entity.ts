@@ -21,4 +21,7 @@ export class Bank extends BaseEntity {
 
     @ManyToOne(type => Users, user => user.banks, { eager: false })
     user: Users;
+
+    @Column()
+    balance: number;
 }
