@@ -5,6 +5,7 @@ import * as config from 'config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.enableCors({ origin: true, credentials: true })
 
   const serverConfig = config.get('server');
   const port = serverConfig.port;
