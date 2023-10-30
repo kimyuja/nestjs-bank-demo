@@ -8,8 +8,11 @@ import { Users } from 'src/auth/user.entity';
 import { PatchBankDto as PatchBankDto } from './dto/patch-bank.dto';
 import { PlusMinusBankDto } from './dto/plus-minus-bank.dto';
 
+var index = 0;
+
 @Injectable()
 export class BanksService {
+
     constructor(
         @InjectRepository(BankRepository)
         private bankRepository: BankRepository,
@@ -122,9 +125,10 @@ export class BanksService {
 
     async plusMinusBank(plusMinusBankDto: PlusMinusBankDto) {
         const { id, amount } = plusMinusBankDto;
-        const found = await this.bankRepository.findOne(id)
-        found.description.push(Number(amount));
+        let found = await this.bankRepository.findOne(id)
+        found.description.push(amount);
         await this.bankRepository.save(found);
+        found = await this.bankRepository.findOne(id)
         let sum = "";
         for (let i = 0; i < found.description.length; i++) {
             const item = found.description[i];
@@ -136,8 +140,8 @@ export class BanksService {
             }
         }
         console.log("sum: " + sum);
-        //const sumInt = this.evaluateExpression(sum);
-        const sumInt = this.evaluateExpression("+3000-1000+50000+1000-1000");
+        const sumInt = this.evaluateExpression(sum);
+        //const sumInt = this.evaluateExpression("2+5+7-3");
         return sumInt;
     }
 
@@ -145,29 +149,28 @@ export class BanksService {
         // 문자열을 "+"와 "-"로 분할
         let parts = expression.split(/[\+\-]/);
         parts.shift();
-        console.log("parts: " + parts);
+        expression = expression.substring(1);
 
         // 연산자를 추출하고 모든 숫자를 더합니다.
-        const result = parts.reduce((total, part, index) => {
+        const result = parts.reduce((total, part) => {
             const value = parseInt(part, 10);
-            console.log("value: " + value);
             if (!isNaN(value)) {
                 if (index === 0) {
+                    index += part.length;
                     return value;
                 }
-                const operator = expression[part.length + index];
+                const operator = expression[index];
                 if (operator === '+') {
-                    console.log("total: " + total + ", value: " + value + "total+value: " + (total + value));
+                    index = index + (part.length + 1);
                     return total + value;
                 } else if (operator === '-') {
-                    console.log("total: " + total + ", value: " + value + "total-value: " + (total - value));
+                    index = index + (part.length + 1);
                     return total - value;
                 }
             }
-            console.log("total: " + total);
             return total;
         }, 0);
-        console.log("result: " + result);
+        index = 0;
         return result;
     }
 }
