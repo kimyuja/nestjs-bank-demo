@@ -8,6 +8,7 @@ import { BanksService as BanksService } from './banks.service';
 import { CreateBankDto as CreateBankDto } from './dto/create-bank.dto';
 import { BoardStatusValidationPipe as BankStatusValidationPipe } from './pipes/bank-status-validation.pipe';
 import { PatchBankDto as PatchBankDto } from './dto/patch-bank.dto';
+import { PlusMinusBankDto } from './dto/plus-minus-bank.dto';
 
 @Controller('banks')
 @UseGuards(AuthGuard())
@@ -55,6 +56,10 @@ export class BanksController {
     }
 
     // 입출금 기능
+    @Patch('/plusminus')
+    plusMinusBank(@Body() plusMinusBankDto: PlusMinusBankDto) {
+        return this.banksService.plusMinusBank(plusMinusBankDto);
+    }
 
     // 계좌 이체
 

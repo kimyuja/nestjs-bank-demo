@@ -6,6 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Bank } from './bank.entity';
 import { Users } from 'src/auth/user.entity';
 import { PatchBankDto as PatchBankDto } from './dto/patch-bank.dto';
+import { PlusMinusBankDto } from './dto/plus-minus-bank.dto';
 
 @Injectable()
 export class BanksService {
@@ -95,6 +96,16 @@ export class BanksService {
         const bank = await this.getBankById(id);
 
         bank.status = status;
+        // 나중에 title 적기 귀찮으면 주석 해제해서 쓰기
+        // if (patchBankDto.title == ""){
+        //     if(status == BankStatus.DEPOSIT){
+        //         bank.title = "예금"
+        //     } else {
+        //         bank.title = "적금"
+        //     }
+        // } else {
+        //     bank.title = patchBankDto.title;
+        // }
         bank.title = patchBankDto.title;
 
         if (status == BankStatus.DEPOSIT) {
@@ -109,4 +120,54 @@ export class BanksService {
         return bank;
     }
 
+    async plusMinusBank(plusMinusBankDto: PlusMinusBankDto) {
+        const { id, amount } = plusMinusBankDto;
+        const found = await this.bankRepository.findOne(id)
+        found.description.push(Number(amount));
+        await this.bankRepository.save(found);
+        let sum = "";
+        for (let i = 0; i < found.description.length; i++) {
+            const item = found.description[i];
+            if (item[0] != "-") {
+                const itemStr = "+" + item;
+                sum += itemStr;
+            } else {
+                sum += item;
+            }
+        }
+        console.log("sum: " + sum);
+        //const sumInt = this.evaluateExpression(sum);
+        const sumInt = this.evaluateExpression("+3000-1000+50000+1000-1000");
+        return sumInt;
+    }
+
+    evaluateExpression(expression: string): number {
+        // 문자열을 "+"와 "-"로 분할
+        let parts = expression.split(/[\+\-]/);
+        parts.shift();
+        console.log("parts: " + parts);
+
+        // 연산자를 추출하고 모든 숫자를 더합니다.
+        const result = parts.reduce((total, part, index) => {
+            const value = parseInt(part, 10);
+            console.log("value: " + value);
+            if (!isNaN(value)) {
+                if (index === 0) {
+                    return value;
+                }
+                const operator = expression[part.length + index];
+                if (operator === '+') {
+                    console.log("total: " + total + ", value: " + value + "total+value: " + (total + value));
+                    return total + value;
+                } else if (operator === '-') {
+                    console.log("total: " + total + ", value: " + value + "total-value: " + (total - value));
+                    return total - value;
+                }
+            }
+            console.log("total: " + total);
+            return total;
+        }, 0);
+        console.log("result: " + result);
+        return result;
+    }
 }
