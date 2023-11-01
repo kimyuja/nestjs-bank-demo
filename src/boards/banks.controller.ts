@@ -10,7 +10,9 @@ import { BoardStatusValidationPipe as BankStatusValidationPipe } from './pipes/b
 import { PatchBankDto as PatchBankDto } from './dto/patch-bank.dto';
 import { PlusMinusBankDto } from './dto/plus-minus-bank.dto';
 import { TransferBankDto } from './dto/transfer-bank.dto';
+import { ApiTags } from "@nestjs/swagger";
 
+@ApiTags('banks')
 @Controller('banks')
 @UseGuards(AuthGuard())
 export class BanksController {
